@@ -104,11 +104,30 @@ const EMBEDDING_MODEL_OPTIONS = {
       label: "Google: Gemini Embedding 001",
     },
   ],
+  local: [
+    {
+      value: "mxbai-embed-large",
+      label: "Ollama: mxbai-embed-large"
+    },
+    {
+      value: "qwen3-embedding",
+      label: "Ollama: qwen3-embedding"
+    },
+    {
+      value: "embeddinggemma",
+      label: "Ollama: embeddinggemma"
+    },
+    {
+      value: "nomic-embed-text",
+      label: "Ollama: nomic-embed-text"
+    }
+  ]
 }
 
 const DEFAULT_MODEL_BY_PROVIDER = {
   openai: "text-embedding-3-large",
   openrouter: EMBEDDING_MODEL_OPTIONS.openrouter[0].value,
+  local: EMBEDDING_MODEL_OPTIONS.local[0].value
 }
 
 const OPENROUTER_MODEL_ALIASES = {
@@ -121,6 +140,13 @@ const OPENAI_MODEL_ALIASES = {
   "openai/text-embedding-3-large": "text-embedding-3-large",
   "openai/text-embedding-3-small": "text-embedding-3-small",
   "openai/text-embedding-ada-002": "text-embedding-ada-002",
+}
+
+const LOCAL_MODEL_ALIASES = {
+  "mxbai-embed-large": "mxbai-embed-large",
+  "qwen3-embedding": "qwen3-embedding",
+  "embeddinggemma": "embeddinggemma",
+  "nomic-embed-text": "nomic-embed-text",
 }
 
 // ============================================================================
@@ -232,6 +258,9 @@ function getEmbeddingDimensions() {
     "qwen/qwen3-embedding-8b": 4096,
     "mistralai/mistral-embed-2312": 1024,
     "google/gemini-embedding-001": 3072,
+    "mxbai-embed-large": 3072,
+    "nomic-embed-text" : 768,
+    "qwen3-embedding" : 4096
   }
 
   const customDimensions = Number.parseInt(settings.customEmbeddingDimensions, 10)
@@ -2373,6 +2402,9 @@ function createSettingsUI() {
     } else if (provider === "openai" && OPENAI_MODEL_ALIASES[previousValue]) {
       previousValue = OPENAI_MODEL_ALIASES[previousValue]
       settings.embeddingModel = previousValue
+    } else if (provider === "local" && LOCAL_MODEL_ALIASES[previousValue]) {
+      previousValue = LOCAL_MODEL_ALIASES[previousValue]
+      settings.embeddingModel = previousValue
     }
     let matched = false
 
@@ -2417,7 +2449,7 @@ function createSettingsUI() {
       $localDimensionsInput.val(settings.customEmbeddingDimensions ?? "")
     }
 
-    const showModelSelect = provider !== "local"
+    const showModelSelect = true
     $modelGroup.toggle(showModelSelect)
 
     if (showModelSelect) {
